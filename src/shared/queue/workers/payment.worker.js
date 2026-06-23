@@ -46,6 +46,12 @@ const paymentWorker = new Worker(
       await order.save();
 
       // Real-time: notify user + admin
+      emitToUser(order.user._id, "order_status_updated", {
+        orderId: order._id,
+        status: "confirmed",
+        description: "Payment confirmed via Stripe Card",
+        timeline: order.timeline
+      });
       emitToUser(order.user._id, "payment_confirmed", {
         orderId: order._id,
         status: "confirmed",

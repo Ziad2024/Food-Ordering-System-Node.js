@@ -240,7 +240,8 @@ export const updateOrderStatus = async (orderId, status, description) => {
   emitToUser(order.user._id, "order_status_updated", {
     orderId: order._id,
     status,
-    description: order.timeline[order.timeline.length - 1].description
+    description: order.timeline[order.timeline.length - 1].description,
+    timeline: order.timeline
   });
 
   return order;
