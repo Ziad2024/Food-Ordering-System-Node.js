@@ -22,10 +22,22 @@ export const initSocket = (server) => {
       }
     });
 
+    socket.on("join_user_room", (userId) => {
+      if (userId) {
+        socket.join(`user_${userId}`);
+        console.log(`Socket ${socket.id} joined user_${userId} room (join_user_room)`);
+      }
+    });
+
     // Admin joins the admin room
     socket.on("join_admin", () => {
       socket.join("admin");
       console.log(`Socket ${socket.id} joined admin room`);
+    });
+
+    socket.on("join_admin_room", () => {
+      socket.join("admin");
+      console.log(`Socket ${socket.id} joined admin room (join_admin_room)`);
     });
 
     socket.on("disconnect", () => {

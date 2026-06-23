@@ -67,7 +67,7 @@ export const login = async ({ email, password, deviceIdentifier }) => {
   await RefreshToken.findOneAndUpdate(
     { user: user._id, deviceIdentifier },
     { token: hashedRefreshToken, expiresAt },
-    { upsert: true, new: true }
+    { upsert: true, returnDocument: 'after' }
   );
 
   return { accessToken, refreshToken, user: { id: user._id, name: user.name, email: user.email, phone: user.phone, role: user.role, isVerified: user.isVerified } };
@@ -135,7 +135,7 @@ export const verifyOtp = async ({ email, otp, deviceIdentifier }) => {
   await RefreshToken.findOneAndUpdate(
     { user: user._id, deviceIdentifier },
     { token: hashedRefreshToken, expiresAt },
-    { upsert: true, new: true }
+    { upsert: true, returnDocument: 'after' }
   );
 
   return { accessToken, refreshToken, user: { id: user._id, name: user.name, email: user.email, phone: user.phone, role: user.role, isVerified: user.isVerified } };

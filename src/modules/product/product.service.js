@@ -60,7 +60,7 @@ export const updateCategory = async (id, updateData) => {
   const category = await Category.findOneAndUpdate(
     { _id: id, isActive: true },
     { $set: updateData },
-    { new: true, runValidators: true }
+    { returnDocument: 'after', runValidators: true }
   );
 
   if (!category) {
@@ -75,7 +75,7 @@ export const deleteCategory = async (id) => {
   const category = await Category.findOneAndUpdate(
     { _id: id, isActive: true },
     { $set: { isActive: false } },
-    { new: true }
+    { returnDocument: 'after' }
   );
 
   if (!category) {
@@ -197,7 +197,7 @@ export const updateProduct = async (id, updateData) => {
   const product = await Product.findOneAndUpdate(
     { _id: id, isActive: true },
     { $set: updateData },
-    { new: true, runValidators: true }
+    { returnDocument: 'after', runValidators: true }
   ).populate("category", "name image");
 
   if (!product) {
@@ -212,7 +212,7 @@ export const toggleProductAvailability = async (id, isAvailable) => {
   const product = await Product.findOneAndUpdate(
     { _id: id, isActive: true },
     { $set: { isAvailable } },
-    { new: true }
+    { returnDocument: 'after' }
   ).populate("category", "name image");
 
   if (!product) {
@@ -227,7 +227,7 @@ export const deleteProduct = async (id) => {
   const product = await Product.findOneAndUpdate(
     { _id: id, isActive: true },
     { $set: { isActive: false } },
-    { new: true }
+    { returnDocument: 'after' }
   );
 
   if (!product) {

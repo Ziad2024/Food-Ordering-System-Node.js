@@ -64,7 +64,7 @@ export const updateUserRole = async (userId, role) => {
   const user = await User.findByIdAndUpdate(
     userId,
     { $set: { role } },
-    { new: true }
+    { returnDocument: 'after' }
   ).select("-password");
 
   if (!user) {
@@ -81,7 +81,7 @@ export const updateUserStatus = async (userId, isActive) => {
   const user = await User.findByIdAndUpdate(
     userId,
     { $set: { isActive } },
-    { new: true }
+    { returnDocument: 'after' }
   ).select("-password");
 
   if (!user) {

@@ -45,14 +45,14 @@ export const addItemToCart = async (userId, productId, quantity = 1) => {
   await Cart.findOneAndUpdate(
     { user: userId },
     { $setOnInsert: { user: userId, items: [] } },
-    { upsert: true, new: true }
+    { upsert: true, returnDocument: 'after' }
   );
 
   // 2. Try to increment the quantity if the product is already in the cart
   let cart = await Cart.findOneAndUpdate(
     { user: userId, "items.product": productId },
     { $inc: { "items.$.quantity": quantity } },
-    { new: true }
+    { returnDocument: 'after' }
   );
 
   // 3. If item was not in cart, push a new item to the items array
@@ -60,7 +60,7 @@ export const addItemToCart = async (userId, productId, quantity = 1) => {
     cart = await Cart.findOneAndUpdate(
       { user: userId },
       { $push: { items: { product: productId, quantity } } },
-      { new: true }
+      { returnDocument: 'after' }
     );
   }
 
@@ -85,14 +85,14 @@ export const updateItemQuantity = async (userId, productId, quantity) => {
   await Cart.findOneAndUpdate(
     { user: userId },
     { $setOnInsert: { user: userId, items: [] } },
-    { upsert: true, new: true }
+    { upsert: true, returnDocument: 'after' }
   );
 
   // Update quantity of existing item
   let cart = await Cart.findOneAndUpdate(
     { user: userId, "items.product": productId },
     { $set: { "items.$.quantity": quantity } },
-    { new: true }
+    { returnDocument: 'after' }
   );
 
   // If item was not in the cart, add it
@@ -103,7 +103,7 @@ export const updateItemQuantity = async (userId, productId, quantity) => {
     cart = await Cart.findOneAndUpdate(
       { user: userId },
       { $push: { items: { product: productId, quantity } } },
-      { new: true }
+      { returnDocument: 'after' }
     );
   }
 
@@ -117,7 +117,7 @@ export const removeItemFromCart = async (userId, productId) => {
   const cart = await Cart.findOneAndUpdate(
     { user: userId },
     { $pull: { items: { product: productId } } },
-    { new: true }
+    { returnDocument: 'after' }
   );
 
   if (!cart) {
@@ -134,7 +134,7 @@ export const clearCart = async (userId) => {
   const cart = await Cart.findOneAndUpdate(
     { user: userId },
     { $set: { items: [] } },
-    { new: true }
+    { returnDocument: 'after' }
   );
 
   if (!cart) {
