@@ -4,13 +4,15 @@ FROM node:20-alpine
 WORKDIR /usr/src/app
 
 # Install app dependencies
-# A wildcard is used to ensure both package.json AND package-lock.json are copied
 COPY package*.json ./
-
 RUN npm install --production
 
 # Bundle app source
 COPY . .
+
+# Default env vars (overridden by Back4App environment variables if set)
+ENV NODE_ENV=production
+ENV REDIS_URL=rediss://default:gQAAAAAAARhWAAIgcDIwOWM2MWI4YTI1Yzg0OTE0OTFiMGRmN2RiNjdlMjcyYQ@crisp-starfish-71766.upstash.io:6379
 
 # Expose the port the app runs on
 EXPOSE 5000
