@@ -38,13 +38,21 @@ export const register = async (req, res, next) => {
  */
 export const login = async (req, res, next) => {
   try {
-    const { email, password } = req.body;
-    const result = await authService.login({ email, password });
+    const { email, password, deviceIdentifier } = req.body;
+    const devId = deviceIdentifier || req.headers["user-agent"] || "web-browser";
+
+    const { accessToken, refreshToken, user } = await authService.login({ 
+      email, 
+      password, 
+      deviceIdentifier: devId 
+    });
+
+    setRefreshTokenCookie(res, refreshToken);
 
     return successResponse(
       res,
-      { maskedEmail: maskEmail(result.email) },
-      "Credentials verified. 2FA verification code sent to your email.",
+      { accessToken, user },
+      "Login successful.",
       200
     );
   } catch (error) {

@@ -39,7 +39,7 @@ export const register = async ({ name, email, phone, password }) => {
 /**
  * Login user (Step 1 - verify email and password, send 2FA OTP)
  */
-export const login = async ({ email, password }) => {
+export const login = async ({ email, password, deviceIdentifier }) => {
   const user = await User.findOne({ email });
   if (!user) {
     throw new ApiError("Invalid email or password", 401, "INVALID_CREDENTIALS");
@@ -55,10 +55,22 @@ export const login = async ({ email, password }) => {
     throw new ApiError("Invalid email or password", 401, "INVALID_CREDENTIALS");
   }
 
-  // Send 2FA OTP
-  await sendOtpLogic(email, user.name);
+  // Generate tokens
+  const accessToken = signAccessToken({ sub: user._id, email: user.email, role: user.role });
+  const refreshToken = signRefreshToken({ sub: user._id, deviceIdentifier });
 
-  return { email };
+  // Store hashed refresh token in database (Multi-device)
+  const hashedRefreshToken = await bcrypt.hash(refreshToken, 10);
+  const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days
+
+  // Upsert session details for the specific deviceIdentifier
+  await RefreshToken.findOneAndUpdate(
+    { user: user._id, deviceIdentifier },
+    { token: hashedRefreshToken, expiresAt },
+    { upsert: true, new: true }
+  );
+
+  return { accessToken, refreshToken, user: { id: user._id, name: user.name, email: user.email, phone: user.phone, role: user.role, isVerified: user.isVerified } };
 };
 
 /**
