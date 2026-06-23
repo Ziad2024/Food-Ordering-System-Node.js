@@ -15,14 +15,18 @@ const app = express();
 
 const allowedOrigins = (process.env.FRONTEND_URL || "http://localhost:3000")
   .split(",")
-  .map((url) => url.trim());
+  .map((url) => url.trim().replace(/\/$/, "")); // Strip trailing slashes
 
 app.use(cors({
   origin: (origin, callback) => {
     // Allow requests with no origin (e.g. mobile apps, curl, Postman)
-    if (!origin || allowedOrigins.includes(origin)) {
+    if (!origin) return callback(null, true);
+    
+    const cleanOrigin = origin.replace(/\/$/, "");
+    if (allowedOrigins.includes(cleanOrigin)) {
       callback(null, true);
     } else {
+      console.warn(`[CORS Blocked] Origin: '${origin}' not in allowed list:`, allowedOrigins);
       callback(new Error(`CORS: origin ${origin} not allowed`));
     }
   },
